@@ -1,0 +1,3187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlanta Gold & Coin — Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-dim: #8A6E2F;
+    --black: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --surface3: #222222;
+    --border: #2A2A2A;
+    --text: #E8E4DC;
+    --text-dim: #6B6660;
+    --text-mid: #999490;
+    --silver: #A8A8A8;
+    --platinum: #D4D4E8;
+    --palladium: #B8C4D4;
+    --buy-green: #2D5A27;
+    --buy-green-light: #4CAF50;
+    --sell-red: #5A2727;
+    --sell-red-light: #E57373;
+    --dealer: #2D3F5A;
+    --dealer-light: #64B5F6;
+    --wholesale: #3D2D5A;
+    --wholesale-light: #CE93D8;
+    --ar-orange: #4A3010;
+    --ar-orange-light: #FFB74D;
+    --ar-overdue: #5A1A1A;
+    --ar-overdue-light: #FF6B6B;
+    --ar-partial: #3A3A1A;
+    --ar-partial-light: #FFF176;
+    --ar-paid: #1A3A1A;
+    --ar-paid-light: #69F0AE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.02em;
+  }
+
+  .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .date-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-mid);
+    letter-spacing: 0.05em;
+  }
+
+  .spot-bar {
+    display: flex;
+    gap: 16px;
+    background: var(--surface2);
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .spot-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+  }
+
+  .spot-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .spot-label { color: var(--text-dim); }
+  .spot-val { color: var(--text); font-weight: 500; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 14px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text-mid); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* MAIN LAYOUT */
+  .main {
+    padding: 28px 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* KPI ROW */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  .kpi-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-mid);
+  }
+
+  .kpi-change {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  .kpi-change.pos { color: var(--buy-green-light); }
+  .kpi-change.neg { color: var(--sell-red-light); }
+
+  /* METAL INVENTORY ROW */
+  .metal-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .metal-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .metal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .metal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .metal-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .metal-symbol {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .metal-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .metal-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .metal-stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .metal-stat-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  /* CONTENT GRID */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+  }
+
+  /* TRANSACTION TABLE */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+  }
+
+  .panel-action {
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 7px 16px;
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .panel-action:hover { background: var(--gold-light); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    background: var(--surface2);
+  }
+
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #1A1A1A;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .badge-buy { background: var(--buy-green); color: var(--buy-green-light); }
+  .badge-sell { background: var(--sell-red); color: var(--sell-red-light); }
+  .badge-retail { background: #1A2A1A; color: #aaa; border: 1px solid #2A3A2A; }
+  .badge-dealer { background: var(--dealer); color: var(--dealer-light); }
+  .badge-wholesale { background: var(--wholesale); color: var(--wholesale-light); }
+
+  .metal-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+  }
+
+  .inv-link {
+    color: var(--gold-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .inv-link:hover { color: var(--gold); }
+
+  /* FORM PANEL */
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    width: 100%;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold-dim);
+  }
+
+  select option { background: var(--surface2); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .form-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  .form-section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: var(--black);
+    border: none;
+    padding: 12px;
+    border-radius: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+
+  .submit-btn:hover { opacity: 0.85; }
+
+  /* UPLOAD AREA */
+  .upload-area {
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .upload-area:hover { border-color: var(--gold-dim); }
+
+  .upload-icon { font-size: 20px; margin-bottom: 6px; }
+
+  .upload-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* SECTIONS */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    margin-top: 4px;
+  }
+
+  /* SCROLLABLE FORM */
+  .form-scroll {
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
+    padding: 20px;
+  }
+
+  /* PROFIT MARGIN */
+  .margin-good { color: var(--buy-green-light); }
+  .margin-warn { color: #FFB74D; }
+  .margin-bad { color: var(--sell-red-light); }
+
+  /* SUMMARY STRIP */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .strip-item {
+    padding: 14px 18px;
+    border-right: 1px solid var(--border);
+  }
+
+  .strip-item:last-child { border-right: none; }
+
+  .strip-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+  }
+
+  .strip-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .strip-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* FILTER ROW */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+
+  .filter-btn:hover:not(.active) {
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+
+  .search-input {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-left: auto;
+    width: 200px;
+  }
+
+  /* TAB PAGES */
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* KPI DETAIL */
+  .kpi-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 10px;
+    background: var(--surface3);
+    border-radius: 3px;
+    height: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold-light);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-body { padding: 24px; }
+
+  .modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .modal-form-full {
+    grid-column: 1 / -1;
+  }
+
+  .type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .type-option {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .type-option-icon { font-size: 18px; margin-bottom: 4px; }
+
+  .type-option-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .type-option.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  .type-option.selected .type-option-label { color: var(--gold); }
+
+  .dir-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .dir-option {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+  }
+
+  .dir-option.buy { border-color: var(--buy-green); }
+  .dir-option.sell { border-color: var(--sell-red); }
+  .dir-option.buy.selected { background: var(--buy-green); color: var(--buy-green-light); }
+  .dir-option.sell.selected { background: var(--sell-red); color: var(--sell-red-light); }
+
+  .calc-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .calc-item { text-align: center; }
+  .calc-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .calc-val { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--gold-light); }
+
+  /* RECEIVABLES */
+  .ar-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .ar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ar-card.overdue::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--ar-overdue-light);
+  }
+
+  .ar-card.outstanding::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--ar-orange-light);
+  }
+
+  .ar-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .ar-open         { background: var(--ar-orange);  color: var(--ar-orange-light); }
+  .ar-partial      { background: var(--ar-partial); color: var(--ar-partial-light); }
+  .ar-paid         { background: var(--ar-paid);    color: var(--ar-paid-light); }
+  .ar-overdue-badge { background: var(--ar-overdue); color: var(--ar-overdue-light); }
+
+  .ar-days-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .ar-days-ok   { color: var(--text-mid); }
+  .ar-days-warn { background: var(--ar-partial); color: var(--ar-partial-light); }
+  .ar-days-late { background: var(--ar-overdue); color: var(--ar-overdue-light); }
+
+  .ar-progress-wrap {
+    background: var(--surface3);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .ar-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--ar-orange-light), var(--ar-paid-light));
+    transition: width 0.5s ease;
+  }
+
+  .party-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    background: var(--dealer);
+    color: var(--dealer-light);
+  }
+
+  .party-tag.wholesale { background: var(--wholesale); color: var(--wholesale-light); }
+
+  .action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .action-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .action-btn.pay { border-color: var(--ar-paid-light); color: var(--ar-paid-light); }
+  .action-btn.pay:hover { background: var(--ar-paid); }
+
+  .ar-aging-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ar-aging-row:last-child { border-bottom: none; }
+
+  .aging-bucket {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .aging-bar-wrap {
+    flex: 1;
+    background: var(--surface3);
+    border-radius: 3px;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  .aging-bar { height: 100%; border-radius: 3px; }
+
+  .aging-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    width: 90px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .daily-ar-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .daily-ar-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .daily-ar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .daily-ar-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ar-orange-light);
+  }
+
+  .ar-alert-strip {
+    background: linear-gradient(135deg, rgba(90,58,26,0.45), rgba(90,26,26,0.3));
+    border: 1px solid rgba(255,183,77,0.5);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .ar-alert-strip:hover { border-color: var(--ar-orange-light); }
+
+  .ar-alert-left { display: flex; align-items: center; gap: 12px; }
+  .ar-alert-icon { font-size: 20px; }
+
+  .ar-alert-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ar-orange-light);
+    letter-spacing: 0.04em;
+  }
+
+  .ar-alert-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .modal-wide { width: 720px; }
+
+  .pay-log-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .pay-log-row:last-child { border-bottom: none; }
+
+  .pay-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--ar-paid-light);
+  }
+
+  /* NOTIFICATION */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gold-light);
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1200px) {
+    .content-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .metal-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 700px) {
+    .spot-bar { display: none; }
+    .main { padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .modal { width: 95vw; }
+    .modal-form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">⚜</div>
+    <div>
+      <div class="logo-text">Atlanta Gold & Coin</div>
+      <div class="logo-sub">Operations Center — Est. 2010</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="spot-bar">
+      <div class="spot-item"><span class="spot-dot" style="background:#C9A84C"></span><span class="spot-label">AU</span>&nbsp;<span class="spot-val" id="spot-au">—</span></div>
+      <div class="spot-item"><span class="spot-dot" style="background:#A8A8A8"></span><span class="spot-label">AG</span>&nbsp;<span class="spot-val" id="spot-ag">—</span></div>
+      <div class="spot-item"><span class="spot-dot" style="background:#D4D4E8"></span><span class="spot-label">PT</span>&nbsp;<span class="spot-val" id="spot-pt">—</span></div>
+      <div class="spot-item"><span class="spot-dot" style="background:#B8C4D4"></span><span class="spot-label">PD</span>&nbsp;<span class="spot-val" id="spot-pd">—</span></div>
+    </div>
+    <div class="date-display" id="date-display"></div>
+    <button class="panel-action" onclick="openModal()">+ New Transaction</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="switchTab('ledger')">Transaction Ledger</div>
+  <div class="tab" onclick="switchTab('receivables')">Receivables <span id="ar-tab-badge" style="background:var(--ar-orange);color:var(--ar-orange-light);border-radius:3px;padding:1px 6px;font-size:9px;margin-left:4px;display:none"></span></div>
+  <div class="tab" onclick="switchTab('inventory')">Inventory</div>
+  <div class="tab" onclick="switchTab('kpis')">KPIs</div>
+  <div class="tab" onclick="switchTab('setup')">Setup & Docs</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD TAB -->
+  <div class="tab-page active" id="tab-dashboard">
+
+    <!-- KPI ROW -->
+    <div id="ar-alert-dash" class="ar-alert-strip" onclick="switchTabByName('receivables')" style="display:none">
+      <div class="ar-alert-left">
+        <div class="ar-alert-icon">⚠️</div>
+        <div>
+          <div class="ar-alert-text" id="ar-alert-text">Outstanding receivables require attention</div>
+          <div class="ar-alert-sub" id="ar-alert-sub">Click to view Receivables ledger</div>
+        </div>
+      </div>
+      <button class="panel-action" style="background:var(--ar-orange-light);color:#111" onclick="event.stopPropagation();switchTabByName('receivables')">View AR →</button>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Today's Revenue</div>
+        <div class="kpi-value" id="kpi-revenue">$0</div>
+        <div class="kpi-sub">Total proceeds from sales</div>
+        <div class="kpi-change pos" id="kpi-revenue-chg">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Today's COGS</div>
+        <div class="kpi-value" id="kpi-cogs">$0</div>
+        <div class="kpi-sub">Total paid in purchases</div>
+        <div class="kpi-change neg" id="kpi-cogs-chg">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Gross Profit</div>
+        <div class="kpi-value" id="kpi-gp">$0</div>
+        <div class="kpi-sub">Revenue minus COGS</div>
+        <div class="kpi-change" id="kpi-margin">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Transactions Today</div>
+        <div class="kpi-value" id="kpi-txns">0</div>
+        <div class="kpi-sub">Buy + Sell combined</div>
+        <div class="kpi-change" id="kpi-txns-split">—</div>
+      </div>
+    </div>
+
+    <!-- METAL INVENTORY -->
+    <div class="section-label">Metal Inventory — Troy Ounces on Hand</div>
+    <div class="metal-row" style="margin-bottom:24px">
+      <div class="metal-card">
+        <div class="metal-header">
+          <div class="metal-dot" style="background:var(--gold)"></div>
+          <div class="metal-name" style="color:var(--gold-light)">Gold</div>
+          <div class="metal-symbol">XAU</div>
+        </div>
+        <div class="metal-stats">
+          <div>
+            <div class="metal-stat-label">On Hand</div>
+            <div class="metal-stat-val" id="au-hand" style="color:var(--gold-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Bought MTD</div>
+            <div class="metal-stat-val" id="au-bought" style="color:var(--buy-green-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Sold MTD</div>
+            <div class="metal-stat-val" id="au-sold" style="color:var(--sell-red-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+        </div>
+      </div>
+      <div class="metal-card">
+        <div class="metal-header">
+          <div class="metal-dot" style="background:var(--silver)"></div>
+          <div class="metal-name" style="color:var(--silver)">Silver</div>
+          <div class="metal-symbol">XAG</div>
+        </div>
+        <div class="metal-stats">
+          <div>
+            <div class="metal-stat-label">On Hand</div>
+            <div class="metal-stat-val" id="ag-hand" style="color:var(--silver)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Bought MTD</div>
+            <div class="metal-stat-val" id="ag-bought" style="color:var(--buy-green-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Sold MTD</div>
+            <div class="metal-stat-val" id="ag-sold" style="color:var(--sell-red-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+        </div>
+      </div>
+      <div class="metal-card">
+        <div class="metal-header">
+          <div class="metal-dot" style="background:var(--platinum)"></div>
+          <div class="metal-name" style="color:var(--platinum)">Platinum</div>
+          <div class="metal-symbol">XPT</div>
+        </div>
+        <div class="metal-stats">
+          <div>
+            <div class="metal-stat-label">On Hand</div>
+            <div class="metal-stat-val" id="pt-hand" style="color:var(--platinum)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Bought MTD</div>
+            <div class="metal-stat-val" id="pt-bought" style="color:var(--buy-green-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Sold MTD</div>
+            <div class="metal-stat-val" id="pt-sold" style="color:var(--sell-red-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+        </div>
+      </div>
+      <div class="metal-card">
+        <div class="metal-header">
+          <div class="metal-dot" style="background:var(--palladium)"></div>
+          <div class="metal-name" style="color:var(--palladium)">Palladium</div>
+          <div class="metal-symbol">XPD</div>
+        </div>
+        <div class="metal-stats">
+          <div>
+            <div class="metal-stat-label">On Hand</div>
+            <div class="metal-stat-val" id="pd-hand" style="color:var(--palladium)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Bought MTD</div>
+            <div class="metal-stat-val" id="pd-bought" style="color:var(--buy-green-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+          <div>
+            <div class="metal-stat-label">Sold MTD</div>
+            <div class="metal-stat-val" id="pd-sold" style="color:var(--sell-red-light)">0.00</div>
+            <div class="metal-stat-unit">toz</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY'S TRANSACTIONS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Today's Transactions</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim)" id="today-count">0 entries</div>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterTable('all',this)">All</button>
+        <button class="filter-btn" onclick="filterTable('BUY',this)">Buy</button>
+        <button class="filter-btn" onclick="filterTable('SELL',this)">Sell</button>
+        <button class="filter-btn" onclick="filterTable('RETAIL',this)">Retail</button>
+        <button class="filter-btn" onclick="filterTable('DEALER',this)">Dealer</button>
+        <button class="filter-btn" onclick="filterTable('WHOLESALE',this)">Wholesale</button>
+        <input type="text" class="search-input" placeholder="Search transactions…" oninput="searchTable(this.value)">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Time</th>
+              <th>Dir</th>
+              <th>Channel</th>
+              <th>Item / Description</th>
+              <th>Metal</th>
+              <th>Qty</th>
+              <th>Troy Oz</th>
+              <th>Spot @</th>
+              <th>Price Paid/Rcvd</th>
+              <th>Spot%</th>
+              <th>Gross P/L</th>
+              <th>Customer / Party</th>
+              <th>Invoice</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="txn-body">
+            <tr>
+              <td colspan="15" style="text-align:center;padding:40px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">
+                No transactions yet today — click "+ New Transaction" to begin
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /dashboard -->
+
+  <!-- LEDGER TAB -->
+  <div class="tab-page" id="tab-ledger">
+    <div class="section-label">All-Time Transaction Ledger</div>
+    <div class="summary-strip">
+      <div class="strip-item">
+        <div class="strip-label">Total Revenue (All Time)</div>
+        <div class="strip-val" id="led-revenue">$0</div>
+        <div class="strip-sub">All sell transactions</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-label">Total COGS (All Time)</div>
+        <div class="strip-val" id="led-cogs">$0</div>
+        <div class="strip-sub">All buy transactions</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-label">All-Time Gross Profit</div>
+        <div class="strip-val" id="led-gp" style="color:var(--gold-light)">$0</div>
+        <div class="strip-sub">Revenue − COGS</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Complete Transaction History</div>
+        <div style="display:flex;gap:8px">
+          <input type="date" id="filter-date-from" style="width:140px;font-size:11px" onchange="applyDateFilter()">
+          <input type="date" id="filter-date-to" style="width:140px;font-size:11px" onchange="applyDateFilter()">
+          <button class="panel-action" onclick="exportCSV()">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>ID</th>
+              <th>Dir</th>
+              <th>Channel</th>
+              <th>Item</th>
+              <th>Metal</th>
+              <th>Troy Oz</th>
+              <th>Spot @</th>
+              <th>Amount</th>
+              <th>Spot%</th>
+              <th>Gross P/L</th>
+              <th>Party</th>
+              <th>Invoice</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-body">
+            <tr><td colspan="13" style="text-align:center;padding:30px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No transactions recorded yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY TAB -->
+  <div class="tab-page" id="tab-inventory">
+    <div class="section-label">Current Inventory Status</div>
+    <div class="kpi-detail-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi-detail-card">
+        <div class="kpi-label" style="margin-bottom:6px">Gold (XAU)</div>
+        <div class="kpi-value" id="inv-au-val" style="color:var(--gold-light)">$0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid);margin-top:4px"><span id="inv-au-oz">0.00</span> toz @ spot</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="inv-au-bar" style="width:0%"></div></div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label" style="margin-bottom:6px">Silver (XAG)</div>
+        <div class="kpi-value" id="inv-ag-val" style="color:var(--silver)">$0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid);margin-top:4px"><span id="inv-ag-oz">0.00</span> toz @ spot</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="inv-ag-bar" style="width:0%;background:var(--silver)"></div></div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label" style="margin-bottom:6px">Platinum (XPT)</div>
+        <div class="kpi-value" id="inv-pt-val" style="color:var(--platinum)">$0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid);margin-top:4px"><span id="inv-pt-oz">0.00</span> toz @ spot</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="inv-pt-bar" style="width:0%;background:var(--platinum)"></div></div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label" style="margin-bottom:6px">Palladium (XPD)</div>
+        <div class="kpi-value" id="inv-pd-val" style="color:var(--palladium)">$0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid);margin-top:4px"><span id="inv-pd-oz">0.00</span> toz @ spot</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="inv-pd-bar" style="width:0%;background:var(--palladium)"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Inventory Log — Manual Adjustments</div>
+        <button class="panel-action" onclick="openAdjModal()">+ Adjustment</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Metal</th><th>Type</th><th>Oz Change</th><th>Reason</th><th>Entered By</th></tr>
+          </thead>
+          <tbody id="adj-body">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No manual adjustments</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIS TAB -->
+  <div class="tab-page" id="tab-kpis">
+    <div class="section-label">Key Performance Indicators</div>
+
+    <div class="kpi-detail-grid">
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Avg Gross Margin %</div>
+        <div class="kpi-value" id="kpi2-margin" style="color:var(--buy-green-light)">0%</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Revenue − COGS ÷ Revenue</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="kpi2-margin-bar" style="width:0%"></div></div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Avg Spot % Paid (Buys)</div>
+        <div class="kpi-value" id="kpi2-spotbuy">0%</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Of spot price paid to sellers</div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Avg Spot % Received (Sells)</div>
+        <div class="kpi-value" id="kpi2-spotsell" style="color:var(--gold-light)">0%</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Of spot received from buyers</div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Retail Buy Transactions</div>
+        <div class="kpi-value" id="kpi2-retail-buy">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Walk-in customer purchases</div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Dealer Transactions</div>
+        <div class="kpi-value" id="kpi2-dealer" style="color:var(--dealer-light)">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Dealer-to-dealer activity</div>
+      </div>
+      <div class="kpi-detail-card">
+        <div class="kpi-label">Wholesale Transactions</div>
+        <div class="kpi-value" id="kpi2-wholesale" style="color:var(--wholesale-light)">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px">Wholesaler buys/sells</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Revenue by Channel (MTD)</div></div>
+        <div style="padding:20px" id="channel-breakdown">
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-dim);text-align:center;padding:20px">No data yet</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Revenue by Metal (MTD)</div></div>
+        <div style="padding:20px" id="metal-breakdown">
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-dim);text-align:center;padding:20px">No data yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP TAB -->
+  <div class="tab-page" id="tab-setup">
+    <div class="section-label">Setup Guide & Architecture</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Recommended Stack — Production Setup</div></div>
+        <div style="padding:20px;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.8;color:var(--text-mid)">
+          <p style="margin-bottom:16px">This dashboard is a fully functional front-end prototype. To make it production-ready with cloud storage, invoice upload, and multi-device access, deploy it with the following stack:</p>
+
+          <div style="margin-bottom:16px">
+            <div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">DATABASE — Google Sheets (Free)</div>
+            <p>Create a Google Sheet with these tabs: <strong>Transactions, Inventory, Adjustments, SpotPrices, Contacts</strong>. Use Google Apps Script to expose a Web App endpoint that this dashboard POSTs data to. Data persists forever, accessible from any device via Google account. Tim can view/edit directly in Sheets.</p>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">INVOICE STORAGE — Google Drive</div>
+            <p>Each transaction row contains a Google Drive file link. The Apps Script upload handler accepts a base64-encoded file and stores it in a "Invoices/YYYY-MM/" folder structure. Invoices are accessible by link without sharing publicly.</p>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">SPOT PRICES — Metals API</div>
+            <p>Use <strong>metals.dev</strong> or <strong>goldapi.io</strong> (free tiers available) to auto-populate spot prices at transaction entry time. The script pulls current AU/AG/PT/PD and saves it with each transaction row.</p>
+          </div>
+
+          <div>
+            <div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">HOSTING — GitHub Pages or Google Sites</div>
+            <p>Host this HTML file on GitHub Pages (free, private repo possible) or serve it from a Google Site. The dashboard calls the Apps Script Web App URL for all data operations. Zero server costs, zero maintenance.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Google Sheets Schema</div></div>
+        <div style="padding:20px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid);line-height:1.8">
+          <div style="color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">TRANSACTIONS Sheet — Column Headers</div>
+          <div style="background:var(--surface2);border-radius:6px;padding:12px;border:1px solid var(--border);margin-bottom:16px">
+            A: TXN_ID | B: Date | C: Time | D: Direction (BUY/SELL)<br>
+            E: Channel (RETAIL/DEALER/WHOLESALE) | F: Item_Description<br>
+            G: Metal (AU/AG/PT/PD/MIXED) | H: Qty_Units | I: Troy_Oz_Total<br>
+            J: Spot_Price_At_Transaction | K: Price_Paid_Or_Received<br>
+            L: Spot_Pct | M: Gross_PL | N: Customer_Party_Name<br>
+            O: Customer_ID | P: Payment_Method | Q: Invoice_URL<br>
+            R: CTR_Required (Y/N) | S: Notes | T: Entered_By | U: Timestamp
+          </div>
+
+          <div style="color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">INVENTORY Sheet</div>
+          <div style="background:var(--surface2);border-radius:6px;padding:12px;border:1px solid var(--border);margin-bottom:16px">
+            A: Metal | B: Opening_Oz | C: Bought_Oz | D: Sold_Oz<br>
+            E: Adjusted_Oz | F: On_Hand_Oz (=B+C-D+E)<br>
+            G: Spot_Value | H: Cost_Basis | I: Last_Updated
+          </div>
+
+          <div style="color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">CONTACTS Sheet</div>
+          <div style="background:var(--surface2);border-radius:6px;padding:12px;border:1px solid var(--border)">
+            A: Contact_ID | B: Name | C: Type (CUSTOMER/DEALER/WHOLESALER)<br>
+            D: Phone | E: Email | F: Company | G: Tax_ID<br>
+            H: Lifetime_Bought_From | I: Lifetime_Sold_To | J: Notes
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column:1/-1">
+        <div class="panel-header"><div class="panel-title">Compliance & CTR Tracking</div></div>
+        <div style="padding:20px;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.8;color:var(--text-mid)">
+          <p>Each transaction includes a <strong>CTR_Required</strong> flag. The system auto-flags any cash transaction or same-day combination of transactions over $10,000 with a single party. These entries are tagged and filterable for Tim's end-of-month compliance export. The Contacts sheet tracks lifetime transaction totals per customer for BSA reporting awareness. This does NOT replace your legal compliance program — it supplements it.</p>
+          <br>
+          <p><strong style="color:var(--gold-light)">Spot % Calculation:</strong> (Price Paid ÷ (Troy Oz × Spot Price)) × 100. For BUY transactions, lower % = better margin. For SELL transactions, higher % = better premium captured.</p>
+          <br>
+          <p><strong style="color:var(--gold-light)">Gross P/L on Buys:</strong> Not calculated at entry — recorded as COGS. P/L is realized when the item sells. For bullion with known cost basis, P/L = (Sell Price − Buy Price) × Troy Oz.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RECEIVABLES TAB -->
+  <div class="tab-page" id="tab-receivables">
+    <div class="section-label">Accounts Receivable — Dealers &amp; Wholesalers</div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="ar-summary-grid">
+      <div class="ar-card outstanding">
+        <div class="kpi-label">Total Outstanding</div>
+        <div class="kpi-value" id="ar-total-outstanding" style="color:var(--ar-orange-light)">$0</div>
+        <div class="kpi-sub">All open + partial invoices</div>
+      </div>
+      <div class="ar-card overdue">
+        <div class="kpi-label">Overdue (&gt;30 days)</div>
+        <div class="kpi-value" id="ar-overdue-total" style="color:var(--ar-overdue-light)">$0</div>
+        <div class="kpi-sub">Past due — action required</div>
+      </div>
+      <div class="ar-card">
+        <div class="kpi-label">Collected This Month</div>
+        <div class="kpi-value" id="ar-collected-mtd" style="color:var(--ar-paid-light)">$0</div>
+        <div class="kpi-sub">Payments received MTD</div>
+      </div>
+      <div class="ar-card">
+        <div class="kpi-label">Today's New AR</div>
+        <div class="kpi-value" id="ar-today-new" style="color:var(--gold-light)">$0</div>
+        <div class="kpi-sub">Invoiced today</div>
+      </div>
+      <div class="ar-card">
+        <div class="kpi-label">Open Invoices</div>
+        <div class="kpi-value" id="ar-open-count">0</div>
+        <div class="kpi-sub">Active open items</div>
+      </div>
+    </div>
+
+    <!-- DAILY STRIP + AGING -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:20px">
+
+      <!-- AGING REPORT -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">AR Aging Report</div></div>
+        <div style="padding:20px" id="ar-aging-report">
+          <div class="ar-aging-row">
+            <div class="aging-bucket">Current (0–30d)</div>
+            <div class="aging-bar-wrap"><div class="aging-bar" id="age-bar-0" style="background:var(--ar-paid-light);width:0%"></div></div>
+            <div class="aging-val" id="age-val-0" style="color:var(--ar-paid-light)">$0</div>
+          </div>
+          <div class="ar-aging-row">
+            <div class="aging-bucket">31–60 Days</div>
+            <div class="aging-bar-wrap"><div class="aging-bar" id="age-bar-1" style="background:var(--ar-partial-light);width:0%"></div></div>
+            <div class="aging-val" id="age-val-1" style="color:var(--ar-partial-light)">$0</div>
+          </div>
+          <div class="ar-aging-row">
+            <div class="aging-bucket">61–90 Days</div>
+            <div class="aging-bar-wrap"><div class="aging-bar" id="age-bar-2" style="background:var(--ar-orange-light);width:0%"></div></div>
+            <div class="aging-val" id="age-val-2" style="color:var(--ar-orange-light)">$0</div>
+          </div>
+          <div class="ar-aging-row">
+            <div class="aging-bucket">90+ Days</div>
+            <div class="aging-bar-wrap"><div class="aging-bar" id="age-bar-3" style="background:var(--ar-overdue-light);width:0%"></div></div>
+            <div class="aging-val" id="age-val-3" style="color:var(--ar-overdue-light)">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TODAY'S AR SUMMARY + QUICK ADD -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Today's Activity</div>
+          <button class="panel-action" onclick="openARModal()">+ New Invoice</button>
+        </div>
+        <div style="padding:16px">
+          <div class="daily-ar-strip" style="grid-template-columns:1fr 1fr">
+            <div class="daily-ar-card">
+              <div class="daily-ar-label">New AR Today</div>
+              <div class="daily-ar-val" id="ar-daily-new">$0</div>
+            </div>
+            <div class="daily-ar-card">
+              <div class="daily-ar-label">Collected Today</div>
+              <div class="daily-ar-val" id="ar-daily-collected" style="color:var(--ar-paid-light)">$0</div>
+            </div>
+          </div>
+          <div class="section-label" style="margin-top:8px;margin-bottom:10px">Recent Payments</div>
+          <div id="ar-recent-payments">
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);text-align:center;padding:16px">No payments recorded yet</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN AR LEDGER TABLE -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Open &amp; Partial Receivables</div>
+        <div style="display:flex;gap:8px">
+          <button class="filter-btn active" id="ar-filter-open" onclick="setARFilter('open',this)">Open + Partial</button>
+          <button class="filter-btn" id="ar-filter-all" onclick="setARFilter('all',this)">All</button>
+          <button class="filter-btn" id="ar-filter-overdue" onclick="setARFilter('overdue',this)">Overdue</button>
+          <button class="filter-btn" id="ar-filter-paid" onclick="setARFilter('paid',this)">Paid</button>
+          <button class="panel-action" onclick="exportARCSV()" style="margin-left:8px">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Date</th>
+              <th>Due Date</th>
+              <th>Days Out</th>
+              <th>Party</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Invoice Amt</th>
+              <th>Paid</th>
+              <th>Balance Due</th>
+              <th>% Collected</th>
+              <th>Status</th>
+              <th>Payment Ref</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ar-ledger-body">
+            <tr><td colspan="14" style="text-align:center;padding:40px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No receivables yet — click "+ New Invoice" to record a balance due</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- AR — NEW INVOICE MODAL -->
+<div class="modal-overlay" id="ar-modal">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">New Receivable Invoice</div>
+      <button class="modal-close" onclick="closeARModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-grid">
+
+        <div class="modal-form-full">
+          <div class="form-label" style="margin-bottom:8px">Party Type</div>
+          <div class="type-selector">
+            <div class="type-option selected" id="ar-ch-dealer" onclick="setARChannel('DEALER')">
+              <div class="type-option-icon">🤝</div>
+              <div class="type-option-label">Dealer</div>
+            </div>
+            <div class="type-option" id="ar-ch-wholesale" onclick="setARChannel('WHOLESALE')">
+              <div class="type-option-icon">📦</div>
+              <div class="type-option-label">Wholesaler</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="form-label">Invoice Date</div>
+          <input type="date" id="ar-f-date">
+        </div>
+        <div>
+          <div class="form-label">Due Date</div>
+          <input type="date" id="ar-f-due">
+        </div>
+
+        <div class="modal-form-full">
+          <div class="form-label">Party / Company Name</div>
+          <input type="text" id="ar-f-party" placeholder="Dealer or wholesaler name">
+        </div>
+
+        <div class="modal-form-full">
+          <div class="form-label">Description / Items</div>
+          <input type="text" id="ar-f-desc" placeholder="e.g. 50oz Gold Eagles sold on consignment, Wire for silver lot #2024-187…">
+        </div>
+
+        <div>
+          <div class="form-label">Invoice Amount ($)</div>
+          <input type="number" id="ar-f-amount" placeholder="0.00" step="0.01" oninput="updateARCalc()">
+        </div>
+        <div>
+          <div class="form-label">Deposit / Partial Paid at Entry ($)</div>
+          <input type="number" id="ar-f-deposit" placeholder="0.00" step="0.01" value="0" oninput="updateARCalc()">
+        </div>
+
+        <!-- AR Calc display -->
+        <div class="modal-form-full">
+          <div class="calc-display">
+            <div class="calc-item">
+              <div class="calc-label">Invoice Total</div>
+              <div class="calc-val" id="ar-calc-total" style="color:var(--ar-orange-light)">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Deposit</div>
+              <div class="calc-val" id="ar-calc-deposit" style="color:var(--ar-paid-light)">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Balance Due</div>
+              <div class="calc-val" id="ar-calc-balance" style="color:var(--ar-overdue-light)">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Net Terms</div>
+              <div class="calc-val" id="ar-calc-terms" style="font-size:13px">— days</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="form-label">Payment Terms</div>
+          <select id="ar-f-terms">
+            <option value="0">Due on Receipt</option>
+            <option value="7">Net 7</option>
+            <option value="14">Net 14</option>
+            <option value="30" selected>Net 30</option>
+            <option value="45">Net 45</option>
+            <option value="60">Net 60</option>
+          </select>
+        </div>
+        <div>
+          <div class="form-label">Linked Transaction ID (optional)</div>
+          <input type="text" id="ar-f-txnref" placeholder="TXN-XXXXXXX">
+        </div>
+
+        <div class="modal-form-full">
+          <div class="form-label" style="margin-bottom:8px">Attach Invoice Document</div>
+          <div class="upload-area" onclick="document.getElementById('ar-f-invoice').click()">
+            <div class="upload-icon">📋</div>
+            <div class="upload-text" id="ar-upload-text">Click to attach invoice PDF or image</div>
+            <input type="file" id="ar-f-invoice" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleARFile(this)">
+          </div>
+        </div>
+
+        <div>
+          <div class="form-label">Entered By</div>
+          <input type="text" id="ar-f-entered" placeholder="Tim / Hunter">
+        </div>
+        <div>
+          <div class="form-label">Notes</div>
+          <input type="text" id="ar-f-notes" placeholder="Terms negotiated, related deal, etc.">
+        </div>
+
+      </div>
+      <button class="submit-btn" onclick="submitAR()" style="margin-top:16px">RECORD INVOICE</button>
+    </div>
+  </div>
+</div>
+
+<!-- AR — RECORD PAYMENT MODAL -->
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Record Payment Received</div>
+      <button class="modal-close" onclick="closePayModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="pay-invoice-summary" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:20px;font-family:'DM Mono',monospace;font-size:12px;line-height:2;color:var(--text-mid)">
+        Loading…
+      </div>
+      <div class="modal-form-grid">
+        <div>
+          <div class="form-label">Payment Date</div>
+          <input type="date" id="pay-f-date">
+        </div>
+        <div>
+          <div class="form-label">Amount Received ($)</div>
+          <input type="number" id="pay-f-amount" placeholder="0.00" step="0.01" oninput="updatePayCalc()">
+        </div>
+        <div>
+          <div class="form-label">Payment Method</div>
+          <select id="pay-f-method">
+            <option>Wire Transfer</option>
+            <option>ACH</option>
+            <option>Check</option>
+            <option>Cash</option>
+            <option>Store Credit</option>
+          </select>
+        </div>
+        <div>
+          <div class="form-label">Reference / Check # / Wire Conf.</div>
+          <input type="text" id="pay-f-ref" placeholder="Wire ref, check number…">
+        </div>
+        <div class="modal-form-full">
+          <div class="calc-display">
+            <div class="calc-item">
+              <div class="calc-label">Was Owed</div>
+              <div class="calc-val" id="pay-calc-owed" style="color:var(--ar-orange-light)">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Payment</div>
+              <div class="calc-val" id="pay-calc-paying" style="color:var(--ar-paid-light)">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Remaining</div>
+              <div class="calc-val" id="pay-calc-remaining" style="color:var(--ar-overdue-light)">$—</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-form-full">
+          <div class="form-label">Notes</div>
+          <input type="text" id="pay-f-notes" placeholder="Any partial payment terms, disputes, etc.">
+        </div>
+      </div>
+      <input type="hidden" id="pay-target-id">
+      <button class="submit-btn" onclick="submitPayment()" style="margin-top:16px;background:linear-gradient(135deg,#2D5A27,#1A3A1A);color:var(--ar-paid-light)">RECORD PAYMENT RECEIVED</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSACTION MODAL -->
+<div class="modal-overlay" id="txn-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Transaction</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-grid">
+
+        <!-- Direction -->
+        <div class="modal-form-full">
+          <div class="form-label" style="margin-bottom:8px">Transaction Direction</div>
+          <div class="dir-selector">
+            <div class="dir-option buy selected" id="dir-buy" onclick="setDir('BUY')">▲ BUY — Purchasing from customer/dealer</div>
+            <div class="dir-option sell" id="dir-sell" onclick="setDir('SELL')">▼ SELL — Selling to customer/dealer</div>
+          </div>
+        </div>
+
+        <!-- Channel -->
+        <div class="modal-form-full">
+          <div class="form-label" style="margin-bottom:8px">Sales Channel</div>
+          <div class="type-selector">
+            <div class="type-option selected" id="ch-retail" onclick="setChannel('RETAIL')">
+              <div class="type-option-icon">🏪</div>
+              <div class="type-option-label">Retail / Walk-In</div>
+            </div>
+            <div class="type-option" id="ch-dealer" onclick="setChannel('DEALER')">
+              <div class="type-option-icon">🤝</div>
+              <div class="type-option-label">Dealer-to-Dealer</div>
+            </div>
+            <div class="type-option" id="ch-wholesale" onclick="setChannel('WHOLESALE')">
+              <div class="type-option-icon">📦</div>
+              <div class="type-option-label">Wholesaler</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date & Time -->
+        <div>
+          <div class="form-label">Transaction Date</div>
+          <input type="date" id="f-date">
+        </div>
+        <div>
+          <div class="form-label">Time</div>
+          <input type="time" id="f-time">
+        </div>
+
+        <!-- Item Description -->
+        <div class="modal-form-full">
+          <div class="form-label">Item / Description</div>
+          <input type="text" id="f-desc" placeholder="e.g. 2024 Gold Eagle 1oz, 90% Silver Dimes, 100oz PAMP Silver Bar…">
+        </div>
+
+        <!-- Metal & Qty -->
+        <div>
+          <div class="form-label">Primary Metal</div>
+          <select id="f-metal" onchange="updateCalc()">
+            <option value="AU">Gold (XAU)</option>
+            <option value="AG">Silver (XAG)</option>
+            <option value="PT">Platinum (XPT)</option>
+            <option value="PD">Palladium (XPD)</option>
+            <option value="MIXED">Mixed / Other</option>
+          </select>
+        </div>
+        <div>
+          <div class="form-label">Qty (Units / Pieces)</div>
+          <input type="number" id="f-qty" placeholder="1" min="0" step="1" oninput="updateCalc()">
+        </div>
+
+        <!-- Troy Oz -->
+        <div>
+          <div class="form-label">Total Troy Oz</div>
+          <input type="number" id="f-oz" placeholder="1.000" step="0.001" oninput="updateCalc()">
+        </div>
+        <div>
+          <div class="form-label">Spot Price at Time ($/oz)</div>
+          <input type="number" id="f-spot" placeholder="auto-filled" step="0.01" oninput="updateCalc()">
+        </div>
+
+        <!-- Price -->
+        <div>
+          <div class="form-label" id="price-label">Price Paid ($)</div>
+          <input type="number" id="f-price" placeholder="0.00" step="0.01" oninput="updateCalc()">
+        </div>
+        <div>
+          <div class="form-label">Payment Method</div>
+          <select id="f-payment">
+            <option>Cash</option>
+            <option>Check</option>
+            <option>Wire Transfer</option>
+            <option>ACH</option>
+            <option>Store Credit</option>
+            <option>Consignment</option>
+          </select>
+        </div>
+
+        <!-- Calc Display -->
+        <div class="modal-form-full">
+          <div class="calc-display">
+            <div class="calc-item">
+              <div class="calc-label">Spot Value</div>
+              <div class="calc-val" id="calc-spot-val">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Spot %</div>
+              <div class="calc-val" id="calc-spot-pct">—%</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Premium / Discount</div>
+              <div class="calc-val" id="calc-prem">$—</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Per Oz</div>
+              <div class="calc-val" id="calc-per-oz">$—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Party -->
+        <div class="modal-form-full">
+          <div class="form-label">Customer / Party Name</div>
+          <input type="text" id="f-party" placeholder="Full name or company">
+        </div>
+
+        <!-- CTR -->
+        <div>
+          <div class="form-label">CTR Required?</div>
+          <select id="f-ctr">
+            <option value="N">No</option>
+            <option value="Y">Yes — Flag for compliance</option>
+          </select>
+        </div>
+        <div>
+          <div class="form-label">Entered By</div>
+          <input type="text" id="f-enteredby" placeholder="Tim / Hunter">
+        </div>
+
+        <!-- Invoice Upload -->
+        <div class="modal-form-full">
+          <div class="form-label" style="margin-bottom:8px">Invoice / Receipt Upload</div>
+          <div class="upload-area" onclick="document.getElementById('f-invoice').click()">
+            <div class="upload-icon">📎</div>
+            <div class="upload-text" id="upload-text">Click to attach invoice, receipt, or appraisal (PDF, JPG, PNG)</div>
+            <input type="file" id="f-invoice" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect(this)">
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="modal-form-full">
+          <div class="form-label">Notes / Comments</div>
+          <textarea id="f-notes" rows="2" placeholder="Grade, certification #, condition, special terms, estate info…"></textarea>
+        </div>
+
+      </div>
+      <button class="submit-btn" onclick="submitTransaction()">RECORD TRANSACTION</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ⚙️  CONFIGURATION — SET THIS BEFORE GOING LIVE
+// ============================================================
+// After deploying your Apps Script Web App, paste the URL below.
+// It looks like: https://script.google.com/macros/s/XXXXXX.../exec
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUlaV0VNDBcgYx9F73mu9eINpw-kHY-J4izeMVPGv2EVVCcrNGpT8g_qP7SH_v2i0/exec';
+
+// Set to false once APPS_SCRIPT_URL is configured above.
+// While true, the app runs entirely in localStorage (offline/demo mode).
+const OFFLINE_MODE = (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE');
+
+// ============================================================
+// STATE
+// ============================================================
+let transactions = [];
+let adjustments  = [];
+let receivables  = [];
+let payments     = [];
+
+let currentDir      = 'BUY';
+let currentChannel  = 'RETAIL';
+let currentARChannel = 'DEALER';
+let currentFilter   = 'all';
+let currentARFilter = 'open';
+let selectedFile    = null;
+let selectedARFile  = null;
+let payTargetId     = null;
+let isSaving        = false;
+
+// Fallback spot prices — overwritten by live fetch or Apps Script
+let spotPrices = { AU: 3200, AG: 32, PT: 950, PD: 980 };
+
+// ============================================================
+// CLOUD API — core fetch wrappers
+// ============================================================
+
+// GET — load all data from Google Sheets
+async function apiGet(action = 'all') {
+  if (OFFLINE_MODE) return null;
+  try {
+    const url = APPS_SCRIPT_URL + '?action=' + action + '&_=' + Date.now();
+    const res = await fetch(url);
+    return await res.json();
+  } catch (e) {
+    console.warn('AGC API GET failed:', e);
+    return null;
+  }
+}
+
+// POST — write data to Google Sheets
+async function apiPost(action, data) {
+  if (OFFLINE_MODE) return null;
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method : 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Apps Script requires text/plain for CORS
+      body   : JSON.stringify({ action, data })
+    });
+    return await res.json();
+  } catch (e) {
+    console.warn('AGC API POST failed:', e);
+    return null;
+  }
+}
+
+// Upload a file to Google Drive via Apps Script
+async function apiUploadFile(file, date, type) {
+  if (OFFLINE_MODE || !file) return null;
+  try {
+    const base64 = await fileToBase64(file);
+    return await apiPost('uploadInvoice', {
+      filename : file.name,
+      mimeType : file.type,
+      base64,
+      date,
+      type
+    });
+  } catch (e) {
+    console.warn('File upload failed:', e);
+    return null;
+  }
+}
+
+// Convert File object to base64 string
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================================
+// INIT — load from cloud or localStorage fallback
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  setDateTimeDefaults();
+  updateDateDisplay();
+
+  if (OFFLINE_MODE) {
+    // Demo/offline: load from localStorage
+    showSyncStatus('offline', '⚡ Offline mode — configure APPS_SCRIPT_URL to enable cloud sync');
+    transactions = JSON.parse(localStorage.getItem('agc_txns')     || '[]');
+    adjustments  = JSON.parse(localStorage.getItem('agc_adj')      || '[]');
+    receivables  = JSON.parse(localStorage.getItem('agc_ar')       || '[]');
+    payments     = JSON.parse(localStorage.getItem('agc_payments') || '[]');
+    renderAll();
+  } else {
+    // Live mode: fetch from Google Sheets
+    showSyncStatus('loading', '⟳ Loading from Google Sheets…');
+    await loadAllFromCloud();
+    await fetchSpotPrices();
+  }
+
+  updateSpotBar();
+});
+
+async function loadAllFromCloud() {
+  const data = await apiGet('all');
+  if (!data || data.status === 'error') {
+    showSyncStatus('error', '⚠ Cloud sync failed — check Apps Script URL');
+    // Fallback to localStorage so the app still works
+    transactions = JSON.parse(localStorage.getItem('agc_txns')     || '[]');
+    adjustments  = JSON.parse(localStorage.getItem('agc_adj')      || '[]');
+    receivables  = JSON.parse(localStorage.getItem('agc_ar')       || '[]');
+    payments     = JSON.parse(localStorage.getItem('agc_payments') || '[]');
+  } else {
+    transactions = mapSheetData(data.transactions || [], 'TXN_ID', {
+      id:'TXN_ID', date:'Date', time:'Time', dir:'Direction', channel:'Channel',
+      desc:'Description', metal:'Metal', qty:'Qty', oz:'Troy_Oz',
+      spot:'Spot_Price', price:'Price', spotPct:'Spot_Pct', grossPL:'Gross_PL',
+      party:'Party', payment:'Payment_Method', ctr:'CTR_Required',
+      invoiceURL:'Invoice_URL', invoiceName:'Invoice_File', notes:'Notes',
+      enteredBy:'Entered_By', ts:'Timestamp'
+    });
+    receivables  = mapSheetData(data.receivables || [], 'AR_ID', {
+      id:'AR_ID', date:'Date', due:'Due_Date', party:'Party', channel:'Channel',
+      desc:'Description', total:'Invoice_Total', paidTotal:'Paid_Total',
+      balance:'Balance', status:'Status', terms:'Terms_Days',
+      txnref:'Linked_TXN', invoiceName:'Invoice_File', invoiceURL:'Invoice_URL',
+      notes:'Notes', entered:'Entered_By', ts:'Timestamp'
+    });
+    payments     = mapSheetData(data.payments || [], 'Payment_ID', {
+      id:'Payment_ID', arId:'AR_ID', date:'Date', amount:'Amount',
+      method:'Method', ref:'Reference', party:'Party', channel:'Channel',
+      notes:'Notes', enteredBy:'Entered_By', ts:'Timestamp'
+    });
+    adjustments  = mapSheetData(data.adjustments || [], 'ADJ_ID', {
+      id:'ADJ_ID', date:'Date', metal:'Metal', type:'Type',
+      oz:'Oz_Change', reason:'Reason', enteredBy:'Entered_By', ts:'Timestamp'
+    });
+
+    // Rebuild payment arrays on receivables from global payments
+    rebuildARPayments();
+
+    // Cache locally as offline fallback
+    localStorage.setItem('agc_txns',     JSON.stringify(transactions));
+    localStorage.setItem('agc_ar',       JSON.stringify(receivables));
+    localStorage.setItem('agc_payments', JSON.stringify(payments));
+    localStorage.setItem('agc_adj',      JSON.stringify(adjustments));
+
+    showSyncStatus('ok', '✓ Synced with Google Sheets · ' + new Date().toLocaleTimeString());
+  }
+
+  renderAll();
+}
+
+// Convert flat sheet row objects into the app's camelCase format
+function mapSheetData(rows, idField, fieldMap) {
+  return rows.map(row => {
+    const obj = {};
+    Object.entries(fieldMap).forEach(([appKey, sheetKey]) => {
+      obj[appKey] = row[sheetKey] !== undefined ? row[sheetKey] : '';
+    });
+    // Cast numerics
+    ['qty','oz','spot','price','spotPct','grossPL','total','paidTotal','balance','amount','terms'].forEach(k => {
+      if (k in obj) obj[k] = parseFloat(obj[k]) || 0;
+    });
+    return obj;
+  }).reverse(); // newest first
+}
+
+// Attach payment history arrays to each receivable
+function rebuildARPayments() {
+  receivables.forEach(ar => {
+    ar.payments = payments.filter(p => p.arId === ar.id);
+  });
+}
+
+// ============================================================
+// SYNC STATUS BAR
+// ============================================================
+function showSyncStatus(state, msg) {
+  let bar = document.getElementById('sync-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'sync-bar';
+    bar.style.cssText = `
+      position:fixed;bottom:0;left:0;right:0;z-index:500;
+      padding:8px 24px;font-family:'DM Mono',monospace;font-size:11px;
+      letter-spacing:0.05em;display:flex;align-items:center;gap:10px;
+      border-top:1px solid #2A2A2A;transition:background 0.3s;
+    `;
+    document.body.appendChild(bar);
+  }
+  const colors = {
+    ok      : { bg:'#0A1A0A', color:'#4CAF50', border:'#2A4A2A' },
+    error   : { bg:'#1A0A0A', color:'#E57373', border:'#4A2A2A' },
+    loading : { bg:'#1A1A0A', color:'#FFB74D', border:'#4A4A2A' },
+    offline : { bg:'#1A1A1A', color:'#6B6660', border:'#2A2A2A' },
+    saving  : { bg:'#0A0A1A', color:'#64B5F6', border:'#2A2A4A' }
+  };
+  const c = colors[state] || colors.offline;
+  bar.style.background   = c.bg;
+  bar.style.color        = c.color;
+  bar.style.borderColor  = c.border;
+  bar.innerHTML = msg + (OFFLINE_MODE ? '' : ' &nbsp;<span style="opacity:0.4;cursor:pointer" onclick="loadAllFromCloud()" title="Refresh from Sheets">↻ Refresh</span>');
+}
+
+function setDateTimeDefaults() {
+  const now = new Date();
+  document.getElementById('f-date').value = now.toISOString().split('T')[0];
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('f-time').value = `${hh}:${mm}`;
+}
+
+function updateDateDisplay() {
+  const now = new Date();
+  document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
+function updateSpotBar() {
+  document.getElementById('spot-au').textContent = '$' + Number(spotPrices.AU).toLocaleString();
+  document.getElementById('spot-ag').textContent = '$' + Number(spotPrices.AG).toFixed(2);
+  document.getElementById('spot-pt').textContent = '$' + Number(spotPrices.PT).toLocaleString();
+  document.getElementById('spot-pd').textContent = '$' + Number(spotPrices.PD).toLocaleString();
+}
+
+async function fetchSpotPrices() {
+  if (OFFLINE_MODE) return;
+  try {
+    const data = await apiGet('spot');
+    if (data && data.spot) {
+      if (data.spot.AU) spotPrices.AU = data.spot.AU;
+      if (data.spot.AG) spotPrices.AG = data.spot.AG;
+      if (data.spot.PT) spotPrices.PT = data.spot.PT;
+      if (data.spot.PD) spotPrices.PD = data.spot.PD;
+      updateSpotBar();
+    }
+  } catch (e) {
+    // Non-fatal — use fallback spot prices
+  }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'kpis') renderKPIs();
+  if (name === 'ledger') renderLedger();
+  if (name === 'inventory') renderInventory();
+  if (name === 'receivables') renderAR();
+}
+
+function switchTabByName(name) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  // Activate correct tab button
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => { if (t.onclick && t.onclick.toString().includes("'" + name + "'")) t.classList.add('active'); });
+  if (name === 'receivables') renderAR();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal() {
+  document.getElementById('txn-modal').classList.add('open');
+  setDateTimeDefaults();
+  // Pre-fill spot from metal selection
+  const metal = document.getElementById('f-metal').value;
+  document.getElementById('f-spot').value = spotPrices[metal] || '';
+}
+
+function closeModal() {
+  document.getElementById('txn-modal').classList.remove('open');
+  clearForm();
+}
+
+function setDir(dir) {
+  currentDir = dir;
+  document.getElementById('dir-buy').classList.toggle('selected', dir === 'BUY');
+  document.getElementById('dir-sell').classList.toggle('selected', dir === 'SELL');
+  document.getElementById('price-label').textContent = dir === 'BUY' ? 'Price Paid ($)' : 'Price Received ($)';
+  updateCalc();
+}
+
+function setChannel(ch) {
+  currentChannel = ch;
+  ['RETAIL','DEALER','WHOLESALE'].forEach(c => {
+    document.getElementById('ch-' + c.toLowerCase()).classList.toggle('selected', c === ch);
+  });
+}
+
+function handleFileSelect(input) {
+  if (input.files.length) {
+    selectedFile = input.files[0];
+    document.getElementById('upload-text').textContent = '📎 ' + selectedFile.name;
+  }
+}
+
+// ============================================================
+// CALCULATIONS
+// ============================================================
+function updateCalc() {
+  const metal = document.getElementById('f-metal').value;
+  const oz = parseFloat(document.getElementById('f-oz').value) || 0;
+  const spot = parseFloat(document.getElementById('f-spot').value) || spotPrices[metal] || 0;
+  const price = parseFloat(document.getElementById('f-price').value) || 0;
+
+  if (!document.getElementById('f-spot').value && metal !== 'MIXED') {
+    document.getElementById('f-spot').value = spotPrices[metal] || '';
+  }
+
+  const spotVal = oz * spot;
+  const pct = spotVal > 0 ? (price / spotVal * 100) : 0;
+  const prem = price - spotVal;
+  const perOz = oz > 0 ? price / oz : 0;
+
+  document.getElementById('calc-spot-val').textContent = spotVal > 0 ? '$' + spotVal.toLocaleString('en-US', {maximumFractionDigits:2}) : '$—';
+  document.getElementById('calc-spot-pct').textContent = pct > 0 ? pct.toFixed(1) + '%' : '—%';
+  document.getElementById('calc-prem').textContent = price > 0 ? (prem >= 0 ? '+' : '') + '$' + prem.toLocaleString('en-US', {maximumFractionDigits:2}) : '$—';
+  document.getElementById('calc-per-oz').textContent = perOz > 0 ? '$' + perOz.toFixed(2) : '$—';
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+async function submitTransaction() {
+  if (isSaving) return;
+  const date      = document.getElementById('f-date').value;
+  const time      = document.getElementById('f-time').value;
+  const desc      = document.getElementById('f-desc').value.trim();
+  const metal     = document.getElementById('f-metal').value;
+  const qty       = parseFloat(document.getElementById('f-qty').value) || 1;
+  const oz        = parseFloat(document.getElementById('f-oz').value) || 0;
+  const spot      = parseFloat(document.getElementById('f-spot').value) || spotPrices[metal] || 0;
+  const price     = parseFloat(document.getElementById('f-price').value) || 0;
+  const payment   = document.getElementById('f-payment').value;
+  const party     = document.getElementById('f-party').value.trim();
+  const ctr       = document.getElementById('f-ctr').value;
+  const enteredBy = document.getElementById('f-enteredby').value.trim();
+  const notes     = document.getElementById('f-notes').value.trim();
+
+  if (!desc || !price || !oz) {
+    showToast('⚠ Please fill in description, troy oz, and price.');
+    return;
+  }
+
+  const spotVal = oz * spot;
+  const spotPct = spotVal > 0 ? (price / spotVal * 100) : 0;
+  const id      = 'TXN-' + Date.now();
+
+  const txn = {
+    id, date, time, dir: currentDir, channel: currentChannel,
+    desc, metal, qty, oz, spot, price, spotPct,
+    grossPL: currentDir === 'SELL' ? price : -price,
+    party, payment, ctr, enteredBy, notes,
+    invoiceName: selectedFile ? selectedFile.name : '',
+    invoiceURL: '',
+    ts: new Date().toISOString()
+  };
+
+  // Optimistic update — show immediately
+  transactions.unshift(txn);
+  localStorage.setItem('agc_txns', JSON.stringify(transactions));
+  closeModal();
+  renderAll();
+  showToast('⟳ Saving transaction…');
+
+  // Upload invoice file if attached
+  if (selectedFile && !OFFLINE_MODE) {
+    isSaving = true;
+    showSyncStatus('saving', '⟳ Uploading invoice to Google Drive…');
+    const upResult = await apiUploadFile(selectedFile, date, 'TXN');
+    if (upResult && upResult.url) {
+      txn.invoiceURL  = upResult.url;
+      txn.invoiceName = upResult.filename;
+      // Patch local copy
+      const idx = transactions.findIndex(t => t.id === id);
+      if (idx > -1) transactions[idx] = txn;
+      localStorage.setItem('agc_txns', JSON.stringify(transactions));
+    }
+    isSaving = false;
+  }
+
+  // Write to Google Sheets
+  if (!OFFLINE_MODE) {
+    showSyncStatus('saving', '⟳ Syncing to Google Sheets…');
+    const result = await apiPost('addTransaction', txn);
+    if (result && result.status === 'ok') {
+      showSyncStatus('ok', '✓ Transaction saved · ' + new Date().toLocaleTimeString());
+      showToast('✓ Transaction recorded: ' + id);
+    } else {
+      showSyncStatus('error', '⚠ Cloud save failed — data kept locally');
+      showToast('⚠ Saved locally only — check sync status');
+    }
+  } else {
+    showToast('✓ Transaction recorded (offline): ' + id);
+  }
+}
+
+function clearForm() {
+  ['f-desc','f-qty','f-oz','f-price','f-party','f-notes','f-enteredby'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  selectedFile = null;
+  document.getElementById('upload-text').textContent = 'Click to attach invoice, receipt, or appraisal (PDF, JPG, PNG)';
+  document.getElementById('f-invoice').value = '';
+  document.getElementById('calc-spot-val').textContent = '$—';
+  document.getElementById('calc-spot-pct').textContent = '—%';
+  document.getElementById('calc-prem').textContent = '$—';
+  document.getElementById('calc-per-oz').textContent = '$—';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAll() {
+  renderDashboard();
+  renderLedger();
+  renderInventory();
+  renderKPIs();
+  updateARDashBadge();
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function renderDashboard() {
+  const today = todayStr();
+  const todayTxns = transactions.filter(t => t.date === today);
+
+  const revenue = todayTxns.filter(t => t.dir === 'SELL').reduce((s,t) => s + t.price, 0);
+  const cogs = todayTxns.filter(t => t.dir === 'BUY').reduce((s,t) => s + t.price, 0);
+  const gp = revenue - cogs;
+  const margin = revenue > 0 ? (gp / revenue * 100) : 0;
+  const buys = todayTxns.filter(t => t.dir === 'BUY').length;
+  const sells = todayTxns.filter(t => t.dir === 'SELL').length;
+
+  document.getElementById('kpi-revenue').textContent = '$' + revenue.toLocaleString('en-US', {maximumFractionDigits:0});
+  document.getElementById('kpi-cogs').textContent = '$' + cogs.toLocaleString('en-US', {maximumFractionDigits:0});
+  document.getElementById('kpi-gp').textContent = '$' + gp.toLocaleString('en-US', {maximumFractionDigits:0});
+  document.getElementById('kpi-gp').style.color = gp >= 0 ? 'var(--buy-green-light)' : 'var(--sell-red-light)';
+  document.getElementById('kpi-margin').textContent = margin.toFixed(1) + '% margin';
+  document.getElementById('kpi-margin').className = 'kpi-change ' + (margin >= 10 ? 'pos' : margin >= 0 ? '' : 'neg');
+  document.getElementById('kpi-txns').textContent = todayTxns.length;
+  document.getElementById('kpi-txns-split').textContent = `${buys} buys · ${sells} sells`;
+  document.getElementById('today-count').textContent = todayTxns.length + ' entries';
+
+  renderMetalCards(transactions);
+  renderTxnTable(todayTxns);
+}
+
+function renderMetalCards(txns) {
+  ['AU','AG','PT','PD'].forEach(m => {
+    const mlo = m.toLowerCase();
+    const bought = txns.filter(t => t.dir === 'BUY' && t.metal === m).reduce((s,t) => s + t.oz, 0);
+    const sold = txns.filter(t => t.dir === 'SELL' && t.metal === m).reduce((s,t) => s + t.oz, 0);
+    const onHand = bought - sold;
+    document.getElementById(mlo + '-hand').textContent = onHand.toFixed(3);
+    document.getElementById(mlo + '-bought').textContent = bought.toFixed(3);
+    document.getElementById(mlo + '-sold').textContent = sold.toFixed(3);
+  });
+}
+
+function renderTxnTable(txns, filter = currentFilter, search = '') {
+  const tbody = document.getElementById('txn-body');
+  let filtered = txns;
+  if (filter !== 'all') {
+    filtered = filtered.filter(t => t.dir === filter || t.channel === filter);
+  }
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(t => [t.desc, t.party, t.id, t.metal, t.notes].join(' ').toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No transactions match the current filter</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((t, i) => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim)">${i+1}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${t.time || '—'}</td>
+      <td><span class="badge badge-${t.dir.toLowerCase()}">${t.dir}</span></td>
+      <td><span class="badge badge-${t.channel.toLowerCase()}">${t.channel}</span></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${t.desc}">${t.desc}</td>
+      <td><span class="metal-pill" style="background:rgba(201,168,76,0.1);color:${metalColor(t.metal)}">${t.metal}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${t.qty}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${parseFloat(t.oz).toFixed(3)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">$${parseFloat(t.spot).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500">${formatMoney(t.price)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${t.spotPct < 80 ? 'var(--buy-green-light)' : t.spotPct < 100 ? '#FFB74D' : 'var(--sell-red-light)'}">${parseFloat(t.spotPct).toFixed(1)}%</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${t.grossPL >= 0 ? 'var(--buy-green-light)' : 'var(--sell-red-light)'}">${t.grossPL >= 0 ? '+' : ''}${formatMoney(t.grossPL)}</td>
+      <td>${t.party || '—'}</td>
+      <td>${t.invoiceName ? `<a class="inv-link" href="#" title="${t.invoiceName}">📎 ${t.invoiceName.substring(0,12)}…</a>` : '<span style="color:var(--text-dim);font-size:11px">—</span>'}</td>
+      <td style="color:var(--text-dim);font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.notes}">${t.notes || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function renderLedger() {
+  const tbody = document.getElementById('ledger-body');
+  const revenue = transactions.filter(t => t.dir === 'SELL').reduce((s,t) => s + t.price, 0);
+  const cogs = transactions.filter(t => t.dir === 'BUY').reduce((s,t) => s + t.price, 0);
+  const gp = revenue - cogs;
+
+  document.getElementById('led-revenue').textContent = formatMoney(revenue);
+  document.getElementById('led-cogs').textContent = formatMoney(cogs);
+  document.getElementById('led-gp').textContent = formatMoney(gp);
+
+  if (transactions.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:30px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No transactions recorded yet</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = transactions.map(t => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${t.date}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim)">${t.id}</td>
+      <td><span class="badge badge-${t.dir.toLowerCase()}">${t.dir}</span></td>
+      <td><span class="badge badge-${t.channel.toLowerCase()}">${t.channel}</span></td>
+      <td>${t.desc}</td>
+      <td><span class="metal-pill" style="background:rgba(201,168,76,0.1);color:${metalColor(t.metal)}">${t.metal}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${parseFloat(t.oz).toFixed(3)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">$${parseFloat(t.spot).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500">${formatMoney(t.price)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${parseFloat(t.spotPct).toFixed(1)}%</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${t.grossPL >= 0 ? 'var(--buy-green-light)' : 'var(--sell-red-light)'}">${t.grossPL >= 0 ? '+' : ''}${formatMoney(t.grossPL)}</td>
+      <td>${t.party || '—'}</td>
+      <td>${t.invoiceName ? `<a class="inv-link" href="#">📎</a>` : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function renderInventory() {
+  ['AU','AG','PT','PD'].forEach(m => {
+    const mlo = m.toLowerCase();
+    const bought = transactions.filter(t => t.dir === 'BUY' && t.metal === m).reduce((s,t) => s + t.oz, 0);
+    const sold = transactions.filter(t => t.dir === 'SELL' && t.metal === m).reduce((s,t) => s + t.oz, 0);
+    const onHand = Math.max(0, bought - sold);
+    const spotVal = onHand * spotPrices[m];
+
+    document.getElementById('inv-' + mlo + '-oz').textContent = onHand.toFixed(3);
+    document.getElementById('inv-' + mlo + '-val').textContent = formatMoney(spotVal);
+    const maxOz = Math.max(bought, 100);
+    document.getElementById('inv-' + mlo + '-bar').style.width = Math.min(100, onHand / maxOz * 100) + '%';
+  });
+}
+
+function renderKPIs() {
+  const sells = transactions.filter(t => t.dir === 'SELL');
+  const buys = transactions.filter(t => t.dir === 'BUY');
+  const revenue = sells.reduce((s,t) => s + t.price, 0);
+  const cogs = buys.reduce((s,t) => s + t.price, 0);
+  const gp = revenue - cogs;
+  const margin = revenue > 0 ? gp / revenue * 100 : 0;
+  const avgSpotBuy = buys.length > 0 ? buys.reduce((s,t) => s + t.spotPct, 0) / buys.length : 0;
+  const avgSpotSell = sells.length > 0 ? sells.reduce((s,t) => s + t.spotPct, 0) / sells.length : 0;
+
+  const retailBuy = transactions.filter(t => t.channel === 'RETAIL').length;
+  const dealer = transactions.filter(t => t.channel === 'DEALER').length;
+  const wholesale = transactions.filter(t => t.channel === 'WHOLESALE').length;
+
+  document.getElementById('kpi2-margin').textContent = margin.toFixed(1) + '%';
+  document.getElementById('kpi2-margin-bar').style.width = Math.min(100, margin) + '%';
+  document.getElementById('kpi2-spotbuy').textContent = avgSpotBuy.toFixed(1) + '%';
+  document.getElementById('kpi2-spotsell').textContent = avgSpotSell.toFixed(1) + '%';
+  document.getElementById('kpi2-retail-buy').textContent = retailBuy;
+  document.getElementById('kpi2-dealer').textContent = dealer;
+  document.getElementById('kpi2-wholesale').textContent = wholesale;
+
+  // Channel breakdown
+  const channels = ['RETAIL','DEALER','WHOLESALE'];
+  const channelRev = {};
+  channels.forEach(c => {
+    channelRev[c] = sells.filter(t => t.channel === c).reduce((s,t) => s + t.price, 0);
+  });
+  const maxRev = Math.max(...Object.values(channelRev), 1);
+  document.getElementById('channel-breakdown').innerHTML = channels.map(c => `
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:11px;margin-bottom:6px">
+        <span style="color:var(--text-mid)">${c}</span>
+        <span style="color:var(--gold-light)">${formatMoney(channelRev[c])}</span>
+      </div>
+      <div style="background:var(--surface3);border-radius:3px;height:6px;overflow:hidden">
+        <div style="width:${channelRev[c]/maxRev*100}%;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:3px"></div>
+      </div>
+    </div>
+  `).join('');
+
+  // Metal breakdown
+  const metals = ['AU','AG','PT','PD'];
+  const metalRev = {};
+  metals.forEach(m => {
+    metalRev[m] = sells.filter(t => t.metal === m).reduce((s,t) => s + t.price, 0);
+  });
+  const maxMRev = Math.max(...Object.values(metalRev), 1);
+  document.getElementById('metal-breakdown').innerHTML = metals.map(m => `
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:11px;margin-bottom:6px">
+        <span style="color:${metalColor(m)}">${m}</span>
+        <span style="color:var(--gold-light)">${formatMoney(metalRev[m])}</span>
+      </div>
+      <div style="background:var(--surface3);border-radius:3px;height:6px;overflow:hidden">
+        <div style="width:${metalRev[m]/maxMRev*100}%;height:100%;background:${metalColor(m)};border-radius:3px;opacity:0.8"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// FILTERS
+// ============================================================
+function filterTable(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const today = todayStr();
+  const todayTxns = transactions.filter(t => t.date === today);
+  renderTxnTable(todayTxns, f);
+}
+
+function searchTable(q) {
+  const today = todayStr();
+  const todayTxns = transactions.filter(t => t.date === today);
+  renderTxnTable(todayTxns, currentFilter, q);
+}
+
+function applyDateFilter() {
+  const from = document.getElementById('filter-date-from').value;
+  const to = document.getElementById('filter-date-to').value;
+  const filtered = transactions.filter(t => {
+    if (from && t.date < from) return false;
+    if (to && t.date > to) return false;
+    return true;
+  });
+  const tbody = document.getElementById('ledger-body');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:30px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No transactions in this date range</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(t => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${t.date}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim)">${t.id}</td>
+      <td><span class="badge badge-${t.dir.toLowerCase()}">${t.dir}</span></td>
+      <td><span class="badge badge-${t.channel.toLowerCase()}">${t.channel}</span></td>
+      <td>${t.desc}</td>
+      <td>${t.metal}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${parseFloat(t.oz).toFixed(3)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">$${parseFloat(t.spot).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${formatMoney(t.price)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${parseFloat(t.spotPct).toFixed(1)}%</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${t.grossPL >= 0 ? 'var(--buy-green-light)' : 'var(--sell-red-light)'}">${t.grossPL >= 0 ? '+' : ''}${formatMoney(t.grossPL)}</td>
+      <td>${t.party || '—'}</td>
+      <td>${t.invoiceName ? '📎' : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportCSV() {
+  const headers = ['TXN_ID','Date','Time','Direction','Channel','Description','Metal','Qty','Troy_Oz','Spot_Price','Price','Spot_Pct','Gross_PL','Party','Payment','CTR','Invoice','Notes','Entered_By','Timestamp'];
+  const rows = transactions.map(t => [
+    t.id, t.date, t.time, t.dir, t.channel, `"${t.desc}"`, t.metal, t.qty,
+    t.oz, t.spot, t.price, t.spotPct.toFixed(2), t.grossPL, `"${t.party}"`,
+    t.payment, t.ctr, `"${t.invoiceName}"`, `"${t.notes}"`, t.enteredBy, t.ts
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AGC_Transactions_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showToast('✓ CSV exported');
+}
+
+// ============================================================
+// INVENTORY ADJUSTMENT MODAL (simplified)
+// ============================================================
+function openAdjModal() {
+  const metal = prompt('Metal to adjust (AU/AG/PT/PD):');
+  if (!metal) return;
+  const oz = parseFloat(prompt('Oz change (positive = add, negative = remove):') || '0');
+  if (isNaN(oz)) return;
+  const reason = prompt('Reason (e.g. Inventory Count, Write-off, Opening Balance):') || '';
+  const enteredBy = prompt('Entered by:') || 'Tim';
+
+  const adj = {
+    date: todayStr(),
+    metal: metal.toUpperCase(),
+    type: oz >= 0 ? 'ADD' : 'REMOVE',
+    oz,
+    reason,
+    enteredBy
+  };
+
+  adjustments.push(adj);
+  localStorage.setItem('agc_adj', JSON.stringify(adjustments));
+
+  const tbody = document.getElementById('adj-body');
+  tbody.innerHTML = adjustments.map(a => `
+    <tr>
+      <td>${a.date}</td>
+      <td>${a.metal}</td>
+      <td><span class="badge ${a.oz >= 0 ? 'badge-buy' : 'badge-sell'}">${a.type}</span></td>
+      <td style="font-family:'DM Mono',monospace;color:${a.oz>=0?'var(--buy-green-light)':'var(--sell-red-light)'}">${a.oz >= 0 ? '+' : ''}${a.oz.toFixed(3)} toz</td>
+      <td>${a.reason}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim)">${a.enteredBy}</td>
+    </tr>
+  `).join('');
+
+  showToast('✓ Inventory adjustment recorded');
+  renderInventory();
+}
+
+// ============================================================
+// RECEIVABLES — MODAL CONTROLS
+// ============================================================
+function openARModal() {
+  const now = new Date();
+  document.getElementById('ar-f-date').value = now.toISOString().split('T')[0];
+  // Set default due date based on Net 30
+  const due = new Date(now);
+  due.setDate(due.getDate() + 30);
+  document.getElementById('ar-f-due').value = due.toISOString().split('T')[0];
+  document.getElementById('ar-modal').classList.add('open');
+}
+
+function closeARModal() {
+  document.getElementById('ar-modal').classList.remove('open');
+  clearARForm();
+}
+
+function setARChannel(ch) {
+  currentARChannel = ch;
+  ['DEALER','WHOLESALE'].forEach(c => {
+    document.getElementById('ar-ch-' + c.toLowerCase()).classList.toggle('selected', c === ch);
+  });
+}
+
+function handleARFile(input) {
+  if (input.files.length) {
+    selectedARFile = input.files[0];
+    document.getElementById('ar-upload-text').textContent = '📋 ' + selectedARFile.name;
+  }
+}
+
+function updateARCalc() {
+  const total = parseFloat(document.getElementById('ar-f-amount').value) || 0;
+  const deposit = parseFloat(document.getElementById('ar-f-deposit').value) || 0;
+  const terms = parseInt(document.getElementById('ar-f-terms').value) || 0;
+  const balance = total - deposit;
+  document.getElementById('ar-calc-total').textContent   = total > 0 ? formatMoney(total) : '$—';
+  document.getElementById('ar-calc-deposit').textContent = deposit > 0 ? formatMoney(deposit) : '$0';
+  document.getElementById('ar-calc-balance').textContent = total > 0 ? formatMoney(Math.max(0, balance)) : '$—';
+  document.getElementById('ar-calc-terms').textContent   = terms === 0 ? 'On Receipt' : 'Net ' + terms;
+}
+
+function clearARForm() {
+  ['ar-f-party','ar-f-desc','ar-f-amount','ar-f-txnref','ar-f-entered','ar-f-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('ar-f-deposit').value = '0';
+  selectedARFile = null;
+  document.getElementById('ar-upload-text').textContent = 'Click to attach invoice PDF or image';
+}
+
+async function submitAR() {
+  if (isSaving) return;
+  const date    = document.getElementById('ar-f-date').value;
+  const due     = document.getElementById('ar-f-due').value;
+  const party   = document.getElementById('ar-f-party').value.trim();
+  const desc    = document.getElementById('ar-f-desc').value.trim();
+  const total   = parseFloat(document.getElementById('ar-f-amount').value) || 0;
+  const deposit = parseFloat(document.getElementById('ar-f-deposit').value) || 0;
+  const terms   = document.getElementById('ar-f-terms').value;
+  const txnref  = document.getElementById('ar-f-txnref').value.trim();
+  const entered = document.getElementById('ar-f-entered').value.trim();
+  const notes   = document.getElementById('ar-f-notes').value.trim();
+
+  if (!party || !total || !desc) {
+    showToast('⚠ Please fill in party name, description, and amount.');
+    return;
+  }
+
+  const id      = 'AR-' + Date.now();
+  const balance = Math.max(0, total - deposit);
+  const status  = balance <= 0 ? 'PAID' : deposit > 0 ? 'PARTIAL' : 'OPEN';
+
+  const ar = {
+    id, date, due, party, desc, channel: currentARChannel,
+    total, paidTotal: deposit, balance, status, terms: parseInt(terms),
+    txnref, entered, notes,
+    invoiceName: selectedARFile ? selectedARFile.name : '',
+    invoiceURL: '',
+    payments: deposit > 0 ? [{
+      date, amount: deposit, method: 'At Entry', ref: 'Deposit',
+      notes: 'Initial deposit recorded at invoice creation',
+      ts: new Date().toISOString()
+    }] : [],
+    ts: new Date().toISOString()
+  };
+
+  // Optimistic update
+  receivables.unshift(ar);
+  if (deposit > 0) {
+    payments.unshift({ arId: id, date, amount: deposit, method: 'At Entry', ref: 'Deposit', party, notes: 'Initial deposit', ts: new Date().toISOString() });
+  }
+  localStorage.setItem('agc_ar',       JSON.stringify(receivables));
+  localStorage.setItem('agc_payments', JSON.stringify(payments));
+  closeARModal();
+  renderAR();
+  updateARDashBadge();
+  showToast('⟳ Saving invoice…');
+
+  // Upload invoice file
+  if (selectedARFile && !OFFLINE_MODE) {
+    isSaving = true;
+    showSyncStatus('saving', '⟳ Uploading invoice to Google Drive…');
+    const upResult = await apiUploadFile(selectedARFile, date, 'AR');
+    if (upResult && upResult.url) {
+      ar.invoiceURL  = upResult.url;
+      ar.invoiceName = upResult.filename;
+      const idx = receivables.findIndex(r => r.id === id);
+      if (idx > -1) receivables[idx] = ar;
+      localStorage.setItem('agc_ar', JSON.stringify(receivables));
+    }
+    isSaving = false;
+  }
+
+  // Write to Sheets
+  if (!OFFLINE_MODE) {
+    showSyncStatus('saving', '⟳ Syncing to Google Sheets…');
+    const result = await apiPost('addReceivable', ar);
+    if (result && result.status === 'ok') {
+      showSyncStatus('ok', '✓ Invoice saved · ' + new Date().toLocaleTimeString());
+      showToast('✓ Invoice recorded: ' + id);
+    } else {
+      showSyncStatus('error', '⚠ Cloud save failed — data kept locally');
+      showToast('⚠ Saved locally only');
+    }
+  } else {
+    showToast('✓ Invoice recorded (offline): ' + id);
+  }
+}
+
+// ============================================================
+// RECEIVABLES — PAYMENT MODAL
+// ============================================================
+function openPayModal(arId) {
+  const ar = receivables.find(r => r.id === arId);
+  if (!ar) return;
+  payTargetId = arId;
+  document.getElementById('pay-target-id').value = arId;
+  document.getElementById('pay-f-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pay-f-amount').value = ar.balance.toFixed(2);
+
+  document.getElementById('pay-invoice-summary').innerHTML = `
+    <span style="color:var(--gold)">Invoice:</span> ${ar.id} &nbsp;|&nbsp;
+    <span style="color:var(--gold)">Party:</span> ${ar.party} &nbsp;|&nbsp;
+    <span style="color:var(--gold)">Invoice Date:</span> ${ar.date}<br>
+    <span style="color:var(--gold)">Total:</span> ${formatMoney(ar.total)} &nbsp;|&nbsp;
+    <span style="color:var(--gold)">Already Paid:</span> <span style="color:var(--ar-paid-light)">${formatMoney(ar.paidTotal)}</span> &nbsp;|&nbsp;
+    <span style="color:var(--gold)">Balance Owed:</span> <span style="color:var(--ar-overdue-light)">${formatMoney(ar.balance)}</span>
+  `;
+
+  updatePayCalc();
+  document.getElementById('pay-modal').classList.add('open');
+}
+
+function closePayModal() {
+  document.getElementById('pay-modal').classList.remove('open');
+  payTargetId = null;
+}
+
+function updatePayCalc() {
+  const arId = document.getElementById('pay-target-id').value;
+  const ar = receivables.find(r => r.id === arId);
+  if (!ar) return;
+  const paying = parseFloat(document.getElementById('pay-f-amount').value) || 0;
+  const remaining = Math.max(0, ar.balance - paying);
+  document.getElementById('pay-calc-owed').textContent    = formatMoney(ar.balance);
+  document.getElementById('pay-calc-paying').textContent  = formatMoney(paying);
+  document.getElementById('pay-calc-remaining').textContent = formatMoney(remaining);
+}
+
+async function submitPayment() {
+  if (isSaving) return;
+  const arId   = document.getElementById('pay-target-id').value;
+  const date   = document.getElementById('pay-f-date').value;
+  const amount = parseFloat(document.getElementById('pay-f-amount').value) || 0;
+  const method = document.getElementById('pay-f-method').value;
+  const ref    = document.getElementById('pay-f-ref').value.trim();
+  const notes  = document.getElementById('pay-f-notes').value.trim();
+
+  if (!amount || amount <= 0) { showToast('⚠ Enter a payment amount.'); return; }
+
+  const arIdx = receivables.findIndex(r => r.id === arId);
+  if (arIdx === -1) return;
+
+  const ar       = receivables[arIdx];
+  const newPaid  = ar.paidTotal + amount;
+  const newBal   = Math.max(0, ar.total - newPaid);
+  const newStatus = newBal <= 0 ? 'PAID' : 'PARTIAL';
+  const payEntry = { date, amount, method, ref, notes, ts: new Date().toISOString() };
+
+  // Optimistic update
+  receivables[arIdx] = { ...ar, paidTotal: newPaid, balance: newBal, status: newStatus, payments: [...(ar.payments || []), payEntry] };
+  const globalPay = { arId, date, amount, method, ref, party: ar.party, channel: ar.channel, notes, ts: new Date().toISOString() };
+  payments.unshift(globalPay);
+
+  localStorage.setItem('agc_ar',       JSON.stringify(receivables));
+  localStorage.setItem('agc_payments', JSON.stringify(payments));
+
+  closePayModal();
+  renderAR();
+  updateARDashBadge();
+  showToast('⟳ Recording payment…');
+
+  if (!OFFLINE_MODE) {
+    showSyncStatus('saving', '⟳ Syncing payment to Google Sheets…');
+    const result = await apiPost('recordPayment', { arId, date, amount, method, ref, party: ar.party, channel: ar.channel, notes, enteredBy: '' });
+    if (result && result.status === 'ok') {
+      showSyncStatus('ok', '✓ Payment synced · ' + new Date().toLocaleTimeString());
+      showToast('✓ Payment of ' + formatMoney(amount) + ' recorded for ' + arId);
+    } else {
+      showSyncStatus('error', '⚠ Cloud save failed — data kept locally');
+      showToast('⚠ Payment saved locally only');
+    }
+  } else {
+    showToast('✓ Payment of ' + formatMoney(amount) + ' recorded (offline) for ' + arId);
+  }
+}
+
+// ============================================================
+// RECEIVABLES — RENDER
+// ============================================================
+function renderAR() {
+  const today = todayStr();
+  const thisMonth = today.substring(0, 7);
+
+  // Summary numbers
+  const open = receivables.filter(r => r.status !== 'PAID');
+  const totalOutstanding = open.reduce((s, r) => s + r.balance, 0);
+
+  const now = new Date();
+  const overdue = open.filter(r => {
+    const due = new Date(r.due);
+    const diff = Math.floor((now - due) / 86400000);
+    return diff > 0;
+  });
+  const overdueTotal = overdue.reduce((s, r) => s + r.balance, 0);
+
+  const collectedMTD = payments.filter(p => p.date.startsWith(thisMonth)).reduce((s, p) => s + p.amount, 0);
+  const todayNew = receivables.filter(r => r.date === today).reduce((s, r) => s + r.total, 0);
+  const dailyCollected = payments.filter(p => p.date === today).reduce((s, p) => s + p.amount, 0);
+
+  document.getElementById('ar-total-outstanding').textContent = formatMoney(totalOutstanding);
+  document.getElementById('ar-overdue-total').textContent     = formatMoney(overdueTotal);
+  document.getElementById('ar-collected-mtd').textContent     = formatMoney(collectedMTD);
+  document.getElementById('ar-today-new').textContent         = formatMoney(todayNew);
+  document.getElementById('ar-open-count').textContent        = open.length;
+  document.getElementById('ar-daily-new').textContent         = formatMoney(todayNew);
+  document.getElementById('ar-daily-collected').textContent   = formatMoney(dailyCollected);
+
+  // Aging buckets
+  const buckets = [0, 0, 0, 0];
+  open.forEach(r => {
+    const due = new Date(r.due);
+    const days = Math.floor((now - due) / 86400000);
+    if (days <= 0)       buckets[0] += r.balance;
+    else if (days <= 30) buckets[1] += r.balance;
+    else if (days <= 60) buckets[2] += r.balance;
+    else                 buckets[3] += r.balance;
+  });
+  const maxBucket = Math.max(...buckets, 1);
+  buckets.forEach((b, i) => {
+    document.getElementById('age-val-' + i).textContent = formatMoney(b);
+    document.getElementById('age-bar-' + i).style.width = (b / maxBucket * 100) + '%';
+  });
+
+  // Recent payments panel
+  const recentPays = payments.slice(0, 5);
+  const rpEl = document.getElementById('ar-recent-payments');
+  if (recentPays.length === 0) {
+    rpEl.innerHTML = '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text-dim);text-align:center;padding:16px">No payments recorded yet</div>';
+  } else {
+    rpEl.innerHTML = recentPays.map(p => `
+      <div class="pay-log-row">
+        <div>
+          <div style="font-size:13px">${p.party}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim)">${p.date} · ${p.method} ${p.ref ? '· ' + p.ref : ''}</div>
+        </div>
+        <div class="pay-amount">${formatMoney(p.amount)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Main ledger
+  renderARTable();
+}
+
+function renderARTable() {
+  const tbody = document.getElementById('ar-ledger-body');
+  const now = new Date();
+  let filtered = [...receivables];
+
+  if (currentARFilter === 'open') {
+    filtered = filtered.filter(r => r.status !== 'PAID');
+  } else if (currentARFilter === 'overdue') {
+    filtered = filtered.filter(r => {
+      if (r.status === 'PAID') return false;
+      return Math.floor((now - new Date(r.due)) / 86400000) > 0;
+    });
+  } else if (currentARFilter === 'paid') {
+    filtered = filtered.filter(r => r.status === 'PAID');
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:12px;">No receivables match this filter</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const daysOut = Math.floor((now - new Date(r.date)) / 86400000);
+    const daysPastDue = Math.floor((now - new Date(r.due)) / 86400000);
+    const pctCollected = r.total > 0 ? (r.paidTotal / r.total * 100) : 0;
+
+    let daysBadgeClass = 'ar-days-ok';
+    if (daysPastDue > 0 && r.status !== 'PAID') daysBadgeClass = 'ar-days-warn';
+    if (daysPastDue > 30 && r.status !== 'PAID') daysBadgeClass = 'ar-days-late';
+
+    let statusBadge = '';
+    if (r.status === 'OPEN')    statusBadge = '<span class="ar-badge ar-open">OPEN</span>';
+    if (r.status === 'PARTIAL') statusBadge = '<span class="ar-badge ar-partial">PARTIAL</span>';
+    if (r.status === 'PAID')    statusBadge = '<span class="ar-badge ar-paid">PAID</span>';
+    if (r.status !== 'PAID' && daysPastDue > 0) statusBadge = '<span class="ar-badge ar-overdue-badge">OVERDUE</span>';
+
+    const payRefs = (r.payments || []).map(p => p.ref || p.method).filter(Boolean).join(', ');
+
+    return `
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-dim)">${r.id}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${r.date}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:${daysPastDue > 0 && r.status !== 'PAID' ? 'var(--ar-overdue-light)' : 'inherit'}">${r.due}</td>
+        <td><span class="ar-days-badge ${daysBadgeClass}">${daysOut}d out${daysPastDue > 0 && r.status !== 'PAID' ? ' · ' + daysPastDue + 'd late' : ''}</span></td>
+        <td style="font-weight:500">${r.party}</td>
+        <td><span class="party-tag ${r.channel === 'WHOLESALE' ? 'wholesale' : ''}">${r.channel}</span></td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:12px" title="${r.desc}">${r.desc}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500">${formatMoney(r.total)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ar-paid-light)">${formatMoney(r.paidTotal)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${r.balance > 0 ? 'var(--ar-orange-light)' : 'var(--ar-paid-light)'}">${formatMoney(r.balance)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="font-family:'DM Mono',monospace;font-size:11px;width:36px">${pctCollected.toFixed(0)}%</div>
+            <div class="ar-progress-wrap" style="width:60px">
+              <div class="ar-progress-fill" style="width:${pctCollected}%"></div>
+            </div>
+          </div>
+        </td>
+        <td>${statusBadge}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);max-width:100px;overflow:hidden;text-overflow:ellipsis" title="${payRefs}">${payRefs || '—'}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            ${r.status !== 'PAID' ? `<button class="action-btn pay" onclick="openPayModal('${r.id}')">+ Payment</button>` : ''}
+            <button class="action-btn" onclick="viewARDetail('${r.id}')">Detail</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function setARFilter(f, btn) {
+  currentARFilter = f;
+  document.querySelectorAll('#tab-receivables .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderARTable();
+}
+
+function viewARDetail(arId) {
+  const ar = receivables.find(r => r.id === arId);
+  if (!ar) return;
+  const payHistory = (ar.payments || []).map(p =>
+    `  ${p.date}  ${formatMoney(p.amount).padEnd(12)}  ${p.method}  ${p.ref || ''}\n  Notes: ${p.notes || '—'}`
+  ).join('\n─────────────────────────────\n');
+
+  alert(`INVOICE: ${ar.id}
+Party: ${ar.party} (${ar.channel})
+Date: ${ar.date} · Due: ${ar.due} · Terms: Net ${ar.terms}
+Description: ${ar.desc}
+─────────────────────────────
+Invoice Total:  ${formatMoney(ar.total)}
+Total Paid:     ${formatMoney(ar.paidTotal)}
+Balance Due:    ${formatMoney(ar.balance)}
+Status: ${ar.status}
+─────────────────────────────
+PAYMENT HISTORY:
+${payHistory || '  No payments recorded'}
+─────────────────────────────
+Linked TXN: ${ar.txnref || '—'}
+Notes: ${ar.notes || '—'}
+Invoice File: ${ar.invoiceName || '—'}`);
+}
+
+function exportARCSV() {
+  const headers = ['AR_ID','Date','Due_Date','Party','Channel','Description','Invoice_Total','Paid_Total','Balance','Status','Terms','Linked_TXN','Invoice_File','Notes'];
+  const rows = receivables.map(r => [
+    r.id, r.date, r.due, `"${r.party}"`, r.channel, `"${r.desc}"`,
+    r.total, r.paidTotal, r.balance, r.status, r.terms, r.txnref || '',
+    `"${r.invoiceName || ''}"`, `"${r.notes || ''}"`
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AGC_Receivables_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showToast('✓ AR CSV exported');
+}
+
+function updateARDashBadge() {
+  const open = receivables.filter(r => r.status !== 'PAID');
+  const totalOutstanding = open.reduce((s, r) => s + r.balance, 0);
+  const now = new Date();
+  const overdueCount = open.filter(r => Math.floor((now - new Date(r.due)) / 86400000) > 0).length;
+
+  const badge = document.getElementById('ar-tab-badge');
+  const strip = document.getElementById('ar-alert-dash');
+  const alertText = document.getElementById('ar-alert-text');
+  const alertSub  = document.getElementById('ar-alert-sub');
+
+  if (open.length > 0) {
+    badge.textContent = open.length;
+    badge.style.display = 'inline';
+    strip.style.display = 'flex';
+    alertText.textContent = formatMoney(totalOutstanding) + ' outstanding across ' + open.length + ' open invoice' + (open.length > 1 ? 's' : '');
+    alertSub.textContent  = overdueCount > 0 ? overdueCount + ' overdue — action required' : 'All invoices within terms';
+    if (overdueCount > 0) strip.style.borderColor = 'var(--ar-overdue-light)';
+  } else {
+    badge.style.display = 'none';
+    strip.style.display = 'none';
+  }
+}
+
+// Close AR modals on overlay click
+document.getElementById('ar-modal').addEventListener('click', function(e) { if (e.target === this) closeARModal(); });
+document.getElementById('pay-modal').addEventListener('click', function(e) { if (e.target === this) closePayModal(); });
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function metalColor(m) {
+  const c = { AU: 'var(--gold-light)', AG: 'var(--silver)', PT: 'var(--platinum)', PD: 'var(--palladium)', MIXED: '#aaa' };
+  return c[m] || '#aaa';
+}
+
+function formatMoney(n) {
+  return '$' + parseFloat(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Close modal on overlay click
+document.getElementById('txn-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
